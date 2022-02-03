@@ -20,29 +20,33 @@ func ConnectDB() *gorm.DB {
 	dbHost := os.Getenv("DB_HOST")
 	dbName := os.Getenv("DB_NAME")
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbName)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8", dbUser, dbPass, dbHost, dbName)
 
 	//Open Connection to database
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("error connecting database")
 	}
+	fmt.Println("db connected")
 	//Closing the database after transaction
-	dbClose, err := db.DB()
-	if err != nil {
-		panic(err)
-	}
-	defer dbClose.Close()
+	// dbClose, err := db.DB()
+	// if err != nil {
+	// 	panic("error closing database")
+	// }
+	// defer dbClose.Close()
 
 	//Automigrate migrate data for given model
+	// test := db.Migrator().HasTable(&entity.Passenger{})
+	// fmt.Println(test)
+	// db.Migrator().DropTable(&entity.Passenger{})
 	db.AutoMigrate(
 		&entity.Passenger{},
-		&entity.Level{},
-		&entity.Transportation{},
-		&entity.TransportationType{},
-		&entity.Officer{},
-		&entity.Order{},
-		&entity.Route{},
+		// &entity.Level{},
+		// &entity.Transportation{},
+		// &entity.TransportationType{},
+		// &entity.Officer{},
+		// &entity.Order{},
+		// &entity.Route{},
 	)
 	return db
 }

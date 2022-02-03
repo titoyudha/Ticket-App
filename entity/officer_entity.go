@@ -3,9 +3,10 @@ package entity
 import "github.com/google/uuid"
 
 type Officer struct {
-	id          uuid.UUID `json:"id,omitempty"`
-	UserName    string    `json:"user_name,omitempty"`
-	Password    string    `json:"password,omitempty"`
-	OfficerName string    `json:"officer_name,omitempty"`
-	IDLevel     Level     `json:"id_level,omitempty"`
+	ID          uuid.UUID `json:"id" gorm:"PrimaryKey" validate:"required"`
+	UserName    string    `json:"user_name" gorm:"type:varchar(100)"`
+	Password    string    `json:"password" gorm:"type:varchar(50)"`
+	OfficerName string    `json:"officer_name" gorm:"type:varchar(100)"`
+	IDLevel     uuid.UUID `json:"id_level" gorm:""`
+	Levels      Level     `json:"levels" gorm:""`
 }
