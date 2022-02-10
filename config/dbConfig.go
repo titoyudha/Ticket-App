@@ -28,25 +28,21 @@ func ConnectDB() *gorm.DB {
 		panic("error connecting database")
 	}
 	fmt.Println("db connected")
-	//Closing the database after transaction
-	// dbClose, err := db.DB()
-	// if err != nil {
-	// 	panic("error closing database")
-	// }
-	// defer dbClose.Close()
 
-	//Automigrate migrate data for given model
-	// test := db.Migrator().HasTable(&entity.Passenger{})
-	// fmt.Println(test)
+	//delete table
 	// db.Migrator().DropTable(&entity.Passenger{})
+	// db.Migrator().DropTable(&entity.Order{})
+	// db.Migrator().DropTable("passenger_order")
+
 	db.AutoMigrate(
 		&entity.Passenger{},
 		// &entity.Level{},
 		// &entity.Transportation{},
 		// &entity.TransportationType{},
 		// &entity.Officer{},
-		// &entity.Order{},
+		&entity.Order{},
 		// &entity.Route{},
 	)
+
 	return db
 }

@@ -17,6 +17,7 @@ func main() {
 		})
 	})
 	router.PassengerRouter(server, connect)
+	router.OrderRouter(server, connect)
 
 	server.Run()
 }
