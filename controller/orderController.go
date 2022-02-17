@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"ticket_app/config"
 	"ticket_app/entity"
+	"ticket_app/helper"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -52,9 +53,9 @@ func (r *OrderRepository) CreateOrder() gin.HandlerFunc {
 		order.TimeCheckIn, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		order.TimeDepart, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		order.DepartureDate, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-		order.Passenger = append(order.Passenger, passenger)
+		// order.Passenger = append(order.Passenger, passenger)
 
-		db.Create(&passenger)
+		// db.Create(&passenger)
 		db.Create(&order)
 		// if result.RowsAffected <= 0 {
 		// 	panic(result)
@@ -63,7 +64,7 @@ func (r *OrderRepository) CreateOrder() gin.HandlerFunc {
 		// if err := db.Model(neworders).Preload("Passenger").Find(&newpassengers).Error; err != nil {
 		// 	panic(err)
 		// }
-		// db.Model(order).Association("Passenger").Append(order.Passenger)
+		db.Model(order).Association("passenger_order").Append(order.Passenger)
 
 		// for _, userOrder := range neworders.Passenger {
 		// 	fmt.Println(userOrder.ID)
@@ -74,4 +75,117 @@ func (r *OrderRepository) CreateOrder() gin.HandlerFunc {
 	}
 }
 
-//generate crud order
+func (r *OrderRepository) GetOrderByID() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var order entity.Order
+		var db = config.ConnectDB()
+
+		sql, err := db.DB()
+		if err != nil {
+			panic("cant connect to database")
+		}
+		defer sql.Close()
+
+		if err := db.Where("id = ?", c.Param("id")).First(&order).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "cant find order by that id",
+			})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"message": "succes find order",
+			"data":    &order,
+		})
+	}
+}
+
+func (r *OrderRepository) GetAllOrder() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var order []entity.Order
+		var db = config.ConnectDB()
+
+		sql, err := db.DB()
+		if err != nil {
+			panic("error connecting to db")
+		}
+		defer sql.Close()
+
+		if err := db.Find(&order).Error; err != nil {
+			c.JSON(http.StatusBadRequest, helper.BuildErrorResponse(
+				http.StatusBadRequest, "cant find order", err.Error(), nil),
+			)
+			return
+		}
+
+		c.JSON(http.StatusOK, helper.BuildResponse(
+			http.StatusOK, "success find order", order),
+		)
+
+	}
+}
+
+func (r *OrderRepository) UpdateOrder() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var order entity.Order
+		var db = config.ConnectDB()
+
+		sql, err := db.DB()
+		if err != nil {
+			panic(err)
+		}
+		defer sql.Close()
+
+		if err := db.Where("id = ?", c.Param("id")).First(&order).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Order Not Found",
+			})
+			return
+		}
+		if err := c.ShouldBindJSON(&order); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "Error while updating order",
+				"data":    nil,
+			})
+		}
+		result := db.Save(&order)
+
+		if result.RowsAffected <= 0 {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Failed to insert data to the database",
+				"data":    nil,
+			})
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "succes updating order",
+			"data":    order,
+		})
+
+	}
+}
+func (r *OrderRepository) DeleteOrder() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var order entity.Order
+		var db = config.ConnectDB()
+
+		sql, err := db.DB()
+		if err != nil {
+			panic(err)
+		}
+		defer sql.Close()
+
+		if err := db.Where("id = ?", c.Param("id")).First(&order).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Order Not Found",
+			})
+			return
+		}
+		db.Delete(&order)
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "succes delete order",
+			"data":    order,
+		})
+
+	}
+}

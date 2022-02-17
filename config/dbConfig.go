@@ -30,9 +30,10 @@ func ConnectDB() *gorm.DB {
 	fmt.Println("db connected")
 
 	//delete table
-	db.Migrator().DropTable(&entity.Passenger{})
-	db.Migrator().DropTable(&entity.Order{})
+	// db.Migrator().DropTable(&entity.Passenger{})
+	// db.Migrator().DropTable(&entity.Order{})
 	// db.Migrator().DropTable("passenger_order")
+	// db.Migrator().DropTable("passenger_id_order_ids")
 
 	db.AutoMigrate(
 		&entity.Passenger{},

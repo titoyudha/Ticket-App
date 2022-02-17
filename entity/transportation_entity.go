@@ -9,4 +9,5 @@ type Transportation struct {
 	Description          string             `json:"description" gorm:"type:varchar(100)"`
 	IDTransportationType uuid.UUID          `json:"id___transportation_type"`
 	TransportationType   TransportationType `json:"transportation_type"`
+	TicketPrice          int
 }

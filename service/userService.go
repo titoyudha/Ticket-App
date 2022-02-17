@@ -1,32 +1,53 @@
 package service
 
 import (
+	"net/http"
 	"ticket_app/entity"
+	"ticket_app/middleware"
 
-	"github.com/google/uuid"
-	"gorm.io/gorm"
+	"github.com/gin-gonic/gin"
 )
 
-type Service struct {
-	db *gorm.DB
-}
-type Passenger struct {
-	ID            uuid.UUID `gorm:"primaryKey;many2many;not null" json:"id" validate:"required"`
-	UserName      string    `json:"user_name" gorm:"type:varchar(100)"`
-	Password      string    `json:"password" gorm:"type:varchar(50)"`
-	PassengerName string    `json:"passenger_name" gorm:"type:varchar(100)"`
-	Address       string    `json:"address" gorm:"type:varchar(100)"`
-	Gender        string    `json:"gender" gorm:"type:varchar(10)"`
-	PhoneNumber   string    `json:"phone_number" gorm:"type:varchar(100)"`
+type NewUserRepository interface {
+	// SignIn(email string, password string) (message string, err error)
+	LogIn(email string, password string) gin.HandlerFunc
+	// LogOut(email string) string
 }
 
-var passenger = entity.Passenger{}
+type newUserConnection struct {
+	message string
+}
 
-func (passenger *Passenger) Create(db *gorm.DB) (*Passenger, error) {
-	err := db.Debug().Save(&passenger).Error
-	if err != nil {
-		return passenger, err
+func NewUserService(tes string) NewUserRepository {
+	return &newUserConnection{
+		message: tes,
 	}
-	return passenger, nil
+}
 
+var newPassenger = entity.Passenger{}
+
+func (userService *newUserConnection) LogIn(email string, password string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var passenger entity.Passenger
+
+		if err := c.ShouldBindJSON(&passenger); err != nil {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{
+				"message": "invalid json provide",
+				"error":   http.StatusUnprocessableEntity,
+			})
+			return
+		}
+
+		if newPassenger.UserName != passenger.UserName || newPassenger.Password != passenger.Password {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"message": "Invalid Email or Password",
+				"error":   http.StatusUnauthorized,
+			})
+		}
+
+		ts, err := middleware.CreateToken(newPassenger.ID)
+		if err != nil {
+			c.JSON(http.StatusUnprocessableEntity, err.Error())
+		}
+	}
 }
