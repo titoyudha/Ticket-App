@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"ticket_app/config"
 	"ticket_app/entity"
-	"ticket_app/helper"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -93,6 +92,7 @@ func (r *OrderRepository) GetOrderByID() gin.HandlerFunc {
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{
+			"code":    http.StatusOK,
 			"message": "succes find order",
 			"data":    &order,
 		})
@@ -111,15 +111,19 @@ func (r *OrderRepository) GetAllOrder() gin.HandlerFunc {
 		defer sql.Close()
 
 		if err := db.Find(&order).Error; err != nil {
-			c.JSON(http.StatusBadRequest, helper.BuildErrorResponse(
-				http.StatusBadRequest, "cant find order", err.Error(), nil),
-			)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":    http.StatusBadRequest,
+				"message": "data not found",
+				"data":    nil,
+			})
 			return
 		}
 
-		c.JSON(http.StatusOK, helper.BuildResponse(
-			http.StatusOK, "success find order", order),
-		)
+		c.JSON(http.StatusOK, gin.H{
+			"code":    http.StatusOK,
+			"message": "success get all order",
+			"data":    &order,
+		})
 
 	}
 }

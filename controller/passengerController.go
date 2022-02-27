@@ -3,14 +3,15 @@ package controller
 import (
 	"net/http"
 	"ticket_app/config"
+	"ticket_app/dto"
 	"ticket_app/entity"
+	"ticket_app/middleware"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
-
-//fix this
 
 type PassangerRepository struct {
 	db *gorm.DB
@@ -177,6 +178,41 @@ func (r PassangerRepository) DeletePassenger() gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "succesfull delete",
 			"data":    nil,
+		})
+	}
+}
+
+func LogInPassenger() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userLogIn := dto.PassengerLogIn{}
+		dbConn := config.ConnectDB()
+		c.BindJSON(&userLogIn)
+
+		var user entity.Passenger
+		err := dbConn.Where("email = ?", userLogIn.Email).First(&user).Error
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":    http.StatusBadRequest,
+				"message": "email not found",
+			})
+			return
+		}
+		token, _ := middleware.GenerateTokenJWT(user.ID)
+
+		var userResponse = dto.PassengerResponse{
+			ID:        user.ID,
+			Name:      user.UserName,
+			Email:     user.PhoneNumber,
+			Token:     token,
+			CreatedAt: time.Time{},
+			UpdateAt:  time.Time{},
+			DeleteAt:  time.Time{},
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"code":    http.StatusOK,
+			"message": "Succesful Log In",
+			"Data":    userResponse,
 		})
 	}
 }
