@@ -3,7 +3,7 @@ package entity
 type Passenger struct {
 	ID            string `gorm:"primaryKey;auto_increment;type:varchar(255)" json:"id" validate:"required"`
 	UserName      string `json:"user_name" gorm:"type:varchar(100)" validate:"required"`
-	Email         string `json:"email", gorm:"type:varchar(100)" validate:"required,email"`
+	Email         string `json:"email" gorm:"type:varchar(100)" validate:"required"`
 	Password      string `json:"password" gorm:"type:varchar(50)"`
 	PassengerName string `json:"passenger_name" gorm:"type:varchar(100)"`
 	Address       string `json:"address" gorm:"type:varchar(100)"`
