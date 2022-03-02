@@ -8,14 +8,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
-type OrderRepository struct {
-	db *gorm.DB
-}
-
-func (r *OrderRepository) CreateOrder() gin.HandlerFunc {
+func CreateOrder() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			order     entity.Order
@@ -74,7 +69,7 @@ func (r *OrderRepository) CreateOrder() gin.HandlerFunc {
 	}
 }
 
-func (r *OrderRepository) GetOrderByID() gin.HandlerFunc {
+func GetOrderByID() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var order entity.Order
 		var db = config.ConnectDB()
@@ -99,7 +94,7 @@ func (r *OrderRepository) GetOrderByID() gin.HandlerFunc {
 	}
 }
 
-func (r *OrderRepository) GetAllOrder() gin.HandlerFunc {
+func GetAllOrder() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var order []entity.Order
 		var db = config.ConnectDB()
@@ -128,7 +123,7 @@ func (r *OrderRepository) GetAllOrder() gin.HandlerFunc {
 	}
 }
 
-func (r *OrderRepository) UpdateOrder() gin.HandlerFunc {
+func UpdateOrder() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var order entity.Order
 		var db = config.ConnectDB()
@@ -167,7 +162,7 @@ func (r *OrderRepository) UpdateOrder() gin.HandlerFunc {
 
 	}
 }
-func (r *OrderRepository) DeleteOrder() gin.HandlerFunc {
+func DeleteOrder() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var order entity.Order
 		var db = config.ConnectDB()

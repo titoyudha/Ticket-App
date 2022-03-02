@@ -6,6 +6,7 @@ import (
 	"ticket_app/dto"
 	"ticket_app/entity"
 	"ticket_app/middleware"
+	"ticket_app/service"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -54,8 +55,6 @@ func (r PassangerRepository) CreatePassenger() gin.HandlerFunc {
 	}
 
 }
-
-//generate crud passenger
 
 func (r PassangerRepository) GetPassenger() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -212,7 +211,37 @@ func LogInPassenger() gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{
 			"code":    http.StatusOK,
 			"message": "Succesful Log In",
-			"Data":    userResponse,
+			"Data":    userResponse.Token,
+		})
+	}
+}
+
+func RegisterController() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var userToCreate dto.PassengerCreate
+		err := c.BindJSON(userToCreate)
+		if err == nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":  http.StatusBadRequest,
+				"error": "Enter Valid Registration Format",
+			})
+			return
+		}
+		userDB, InsertErr := service.Register(userToCreate)
+		if InsertErr != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"code":    http.StatusInternalServerError,
+				"message": "Failed Creating User",
+			})
+			return
+		}
+
+		userDB.ID = uuid.New().String()
+
+		c.JSON(http.StatusCreated, gin.H{
+			"code":    http.StatusCreated,
+			"Message": "Succesful Created User",
+			"Data":    userDB.UserName,
 		})
 	}
 }
