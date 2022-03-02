@@ -32,3 +32,10 @@ type PassengerResponse struct {
 	UpdateAt  time.Time `json:"updated_at"`
 	DeleteAt  time.Time `json:"delete_at"`
 }
+
+type PassengerOrder struct {
+	Name        string
+	Address     string
+	Gender      string
+	PhoneNumber string
+}
