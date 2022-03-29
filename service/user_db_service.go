@@ -9,15 +9,16 @@ import (
 	"github.com/google/uuid"
 )
 
-func Register(userCreate dto.PassengerCreate) (entity.Passenger, error) {
+func Register(userCreate dto.PassengerCreate) (entity.User, error) {
 	hash, _ := helper.HashPassword(userCreate.Password)
-	var passenger entity.Passenger
+	var (
+		passenger entity.User
+	)
 
 	passenger.ID = uuid.New().String()
-	passenger.UserName = userCreate.Name
+	passenger.UserFullName = userCreate.Name
 	passenger.Email = userCreate.Email
 	passenger.Password = hash
-	passenger.Address = userCreate.Address
 
 	err := config.ConnectDB().Create(&passenger).Error
 	if err != nil {
@@ -26,8 +27,8 @@ func Register(userCreate dto.PassengerCreate) (entity.Passenger, error) {
 	return passenger, nil
 }
 
-func LogIn(userLogin dto.PassengerLogIn) (entity.Passenger, error) {
-	var passengerDB entity.Passenger
+func LogIn(userLogin dto.PassengerLogIn) (entity.User, error) {
+	var passengerDB entity.User
 
 	err := config.ConnectDB().Where("email", userLogin.Email).First(&passengerDB).Error
 	checkHash, _ := helper.CheckHashPassword(userLogin.Password, passengerDB.Password)
@@ -39,7 +40,7 @@ func LogIn(userLogin dto.PassengerLogIn) (entity.Passenger, error) {
 	return passengerDB, nil
 }
 
-func GetAllUserData() (dataResult []entity.Passenger, err error) {
+func GetAllUserData() (dataResult []entity.User, err error) {
 	err = config.ConnectDB().Find(&dataResult).Error
 	if err != nil {
 		return nil, err
@@ -47,8 +48,8 @@ func GetAllUserData() (dataResult []entity.Passenger, err error) {
 	return
 }
 
-func GetUserDetail(userID string) (entity.Passenger, error) {
-	var passengerDB entity.Passenger
+func GetUserDetail(userID string) (entity.User, error) {
+	var passengerDB entity.User
 
 	err := config.ConnectDB().First(&passengerDB, userID).Error
 	if err != nil {
@@ -58,7 +59,7 @@ func GetUserDetail(userID string) (entity.Passenger, error) {
 }
 
 func CheckHashPassword(password, userID string) (verified bool, err error) {
-	var passenger entity.Passenger
+	var passenger entity.User
 
 	err = config.ConnectDB().Where("id = ?", userID).First(&passenger).Error
 	confirmedUser, _ := helper.CheckHashPassword(password, passenger.Password)
@@ -70,14 +71,13 @@ func CheckHashPassword(password, userID string) (verified bool, err error) {
 	return true, err
 }
 
-func EditUser(userToEdit dto.PassengerEdit, userID string) (entity.Passenger, error) {
+func EditUser(userToEdit dto.PassengerEdit, userID string) (entity.User, error) {
 	hash, _ := helper.HashPassword(userToEdit.NewPassword)
-	var passenger entity.Passenger
+	var passenger entity.User
 
 	err := config.ConnectDB().First(&passenger, userID).Error
 
-	passenger.PassengerName = userToEdit.Name
-	passenger.Address = userToEdit.Address
+	passenger.UserFullName = userToEdit.Name
 	passenger.Email = userToEdit.Email
 	passenger.Password = hash
 
@@ -90,8 +90,8 @@ func EditUser(userToEdit dto.PassengerEdit, userID string) (entity.Passenger, er
 	return passenger, nil
 }
 
-func DeleteUser(userID string) (entity.Passenger, error) {
-	var passenger entity.Passenger
+func DeleteUser(userID string) (entity.User, error) {
+	var passenger entity.User
 
 	err := config.ConnectDB().Where("id = ?", userID).Delete(&passenger).Error
 

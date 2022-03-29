@@ -1,16 +1,15 @@
 package entity
 
-import "time"
+import (
+	"time"
+)
 
 type Payment struct {
-	ID               string           `json:"id"`
-	DeadlinePayment  time.Time        `json:"deadline_payment"`
-	Status           string           `json:"status"`
-	TotalPayment     int              `json:"total_payment"`
-	PaymentMethod    string           `json:"payment_method"`
-	TransportationID []Transportation `json:"transportation_id"`
-	UserID           []Passenger      `json:"user_id"`
-	OrderID          []Order          `json:"order_id"`
-	CreatedAt        time.Time        `json:"created_at"`
-	UpdatedAt        time.Time        `json:"updated_at"`
+	IDPayment       string    `json:"id_payment"`
+	Status          string    `json:"status,omitempty"`
+	Order           []Order   `json:"order,omitempty"`
+	DeadlinePayment time.Time `json:"deadline_payment,omitempty"`
+	CreatedAt       time.Time `json:"created_at,omitempty"`
+	UpdatedAt       time.Time `json:"updated_at,omitempty"`
+	DeletedAt       time.Time `json:"deleted_at,omitempty"`
 }

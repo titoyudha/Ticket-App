@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"ticket_app/config"
 	"ticket_app/router"
 
@@ -9,15 +10,15 @@ import (
 
 func main() {
 	server := gin.Default()
-	connect := config.ConnectDB()
+	dbConn := config.ConnectDB()
 
 	server.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "server is running",
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Hello World",
 		})
 	})
-	router.PassengerRouter(server, connect)
-	router.OrderRouter(server, connect)
+	router.OrderRouter(server, dbConn)
+	router.UserRouter(server, dbConn)
 
-	server.Run()
+	server.Run(":8082")
 }

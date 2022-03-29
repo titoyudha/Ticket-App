@@ -1,13 +1,9 @@
 package entity
 
-import "github.com/google/uuid"
-
 type Transportation struct {
-	ID                   uuid.UUID          `gorm:"primaryKey;not null" json:"id" validate:"required"`
-	Code                 string             `json:"code" gorm:"type:varchar(100)"`
-	TotalSeat            int                `json:"total_seat" gorm:"type:integer(100)"`
-	Description          string             `json:"description" gorm:"type:varchar(100)"`
-	IDTransportationType uuid.UUID          `json:"id___transportation_type"`
-	TransportationType   TransportationType `json:"transportation_type"`
-	TicketPrice          int
+	ID                 string `gorm:"primaryKey;not null" json:"id" validate:"required"`
+	TotalSeat          int    `json:"total_seat" gorm:"type:integer(100)"`
+	TransportationName string `json:"transportation_name,omitempty"`
+	Vechile            string `json:"vechile,omitempty"`
+	Notes              string `json:"notes,omitempty"`
 }
