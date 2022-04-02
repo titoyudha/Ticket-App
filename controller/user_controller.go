@@ -7,9 +7,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
-func CreateUser() gin.HandlerFunc {
+type UserConnection struct {
+	db *gorm.DB
+}
+
+func (db UserConnection) CreateUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user := entity.User{}
 		var db = config.ConnectDB()
@@ -39,4 +44,8 @@ func CreateUser() gin.HandlerFunc {
 			"data":    user,
 		})
 	}
+}
+
+func GetUserByID() {
+
 }

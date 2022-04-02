@@ -1,53 +1,64 @@
 package service
 
 import (
-	"net/http"
 	"ticket_app/entity"
-	"ticket_app/middleware"
 
-	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-type NewUserRepository interface {
-	// SignIn(email string, password string) (message string, err error)
-	LogIn(email string, password string) gin.HandlerFunc
-	// LogOut(email string) string
+type UserRepository interface {
+	CreateUser(user entity.User) entity.User
+	GetUserByID(id string) entity.User
+	GetAllUser() []entity.User
+	UpdateUser(user entity.User) entity.User
+	SignIn(email string, password string) (message string, err error)
+	LogIn(email string, password string) error
+	LogOut(email string) string
 }
 
-type newUserConnection struct {
-	message string
+type userConnection struct {
+	db *gorm.DB
 }
 
-func NewUserService(tes string) NewUserRepository {
-	return &newUserConnection{
-		message: tes,
+//NewUserRepository create instance UserRepository
+func NewUserRepository(dbConn *gorm.DB) UserRepository {
+	return &userConnection{
+		db: dbConn,
 	}
 }
 
-var newUser = entity.User{}
+func (db *userConnection) CreateUser(user entity.User) entity.User {
+	db.db.Save(&user)
+	return user
+}
 
-func (userService *newUserConnection) LogIn(email string, password string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var user entity.User
+func (db *userConnection) GetUserByID(userId string) entity.User {
+	var user entity.User
+	db.db.Find(&user, userId)
+	return user
+}
 
-		if err := c.ShouldBindJSON(&user); err != nil {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{
-				"message": "invalid json provide",
-				"error":   http.StatusUnprocessableEntity,
-			})
-			return
-		}
+func (db *userConnection) GetAllUser() []entity.User {
+	var users []entity.User
+	db.db.Find(&users)
+	return users
+}
 
-		if newUser.UserName != user.UserName || newUser.Password != user.Password {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"message": "Invalid Email or Password",
-				"error":   http.StatusUnauthorized,
-			})
-		}
+func (db *userConnection) UpdateUser(user entity.User) entity.User {
+	db.db.Save(&user)
+	db.db.Find(&user)
 
-		_, err := middleware.CreateToken(newUser.ID)
-		if err != nil {
-			c.JSON(http.StatusUnprocessableEntity, err.Error())
-		}
-	}
+	return user
+}
+
+func (db *userConnection) SignIn(email, password string) (message string, err error) {
+	return "hello", nil
+}
+
+func (db *userConnection) LogIn(email, password string) error {
+	return nil
+}
+
+func (db *userConnection) LogOut(email string) string {
+	return "test"
 }
