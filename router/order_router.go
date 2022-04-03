@@ -7,8 +7,18 @@ import (
 	"gorm.io/gorm"
 )
 
-var a controller.OrderRepository
+var controllerRepo controller.OrderRepository
 
 func OrderRouter(router *gin.Engine, connect *gorm.DB) {
-	router.POST("/order", a.CreateOrder())
+
+	orderRoute := gin.Default()
+	orderRoute.Group("/api/order")
+	{
+		orderRoute.POST("/", controllerRepo.CreateOrder())
+		orderRoute.GET("/", controllerRepo.GetAllOrder())
+		orderRoute.GET("/:id", controllerRepo.GetOrderByID())
+		orderRoute.PUT("/:id", controllerRepo.UpdateOrder())
+		orderRoute.DELETE("/:id", controllerRepo.DeleteOrder())
+	}
+
 }
