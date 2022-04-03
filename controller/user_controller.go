@@ -4,11 +4,24 @@ import (
 	"net/http"
 	"ticket_app/config"
 	"ticket_app/entity"
+	"ticket_app/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
+
+type UserController interface {
+	CreateUser() gin.HandlerFunc
+	GetUserByID() gin.HandlerFunc
+	GetAllUser() gin.HandlerFunc
+	DeleteUser() gin.HandlerFunc
+	UpdateUser() gin.HandlerFunc
+}
+
+type UserRepository struct {
+	userService service.UserRepository
+}
 
 type UserConnection struct {
 	db *gorm.DB
@@ -16,6 +29,7 @@ type UserConnection struct {
 
 func (db UserConnection) CreateUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
+
 		user := entity.User{}
 		var db = config.ConnectDB()
 

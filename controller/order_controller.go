@@ -31,37 +31,25 @@ func (r *OrderRepository) CreateOrder() gin.HandlerFunc {
 			return
 		}
 
-		passengerToInsert := c.ShouldBindJSON(&passenger)
+		params := c.Param("user_id")
+		passengerToInsert := c.ShouldBindJSON(params)
 		if passengerToInsert == nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"message": "error 2",
 			})
 			return
 		}
-		// order.OrderDate, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-		// order.TimeCheckIn, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-		// order.TimeDepart, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-		// order.DepartureDate, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-		// order.ID = uuid.New().String()
-		// order.OrderCode = uuid.New().String()
-		// order.IDPassenger = uuid.New().String()
 
 		passenger.IDPassenger = uuid.New().String()
 		order.IDOrder = uuid.New()
 		order.OrderDate, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 
-		// order.Passenger = append(order.Passenger, passenger)
-
-		// db.Create(&passenger)
-		db.Create(&order)
-		// if result.RowsAffected <= 0 {
-		// 	panic(result)
-		// }
+		db.Save(&order)
 
 		// if err := db.Model(neworders).Preload("Passenger").Find(&newpassengers).Error; err != nil {
 		// 	panic(err)
 		// }
-		db.Model(order).Association("passenger_order").Append(order.Passenger)
+		// db.Model(order).Association("passenger_order").Append(order.User)
 
 		// for _, userOrder := range neworders.Passenger {
 		// 	fmt.Println(userOrder.ID)

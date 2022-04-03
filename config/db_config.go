@@ -30,8 +30,8 @@ func ConnectDB() *gorm.DB {
 	fmt.Println("db connected")
 
 	// db.AutoMigrate(
-	// 	&model.Order{},
-	// 	&model.User{},
+	// 	&entity.Order{},
+	// 	&entity.User{},
 	// )
 
 	return db
