@@ -10,5 +10,13 @@ import (
 var userRepository controller.UserConnection
 
 func UserRouter(router *gin.Engine, connect *gorm.DB) {
-	router.POST("user", userRepository.CreateUser())
+	UserRouter := gin.Default()
+	UserRouter.Group("/api/order")
+	{
+		UserRouter.POST("/", userRepository.CreateUser())
+		UserRouter.GET("/", userRepository.GetAllUser())
+		UserRouter.GET("/:id", userRepository.GetUserByID())
+		UserRouter.PUT("/:id", userRepository.UpdateUser())
+		UserRouter.DELETE("/:id", userRepository.DeleteUser())
+	}
 }

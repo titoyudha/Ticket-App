@@ -60,6 +60,105 @@ func (db UserConnection) CreateUser() gin.HandlerFunc {
 	}
 }
 
-func GetUserByID() {
+func (u UserConnection) GetUserByID() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user entity.User
+		db := config.ConnectDB()
 
+		if err := db.Where("id = ?", c.Param("id")).First(&user).Error; err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "user with that id not found",
+			})
+			return
+		}
+
+		result := u.GetUserByID()
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Succes find user",
+			"data":    result,
+		})
+
+		config.CloseDB(*db)
+	}
+}
+
+func (u UserConnection) GetAllUser() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user []entity.User
+		db := config.ConnectDB()
+
+		if err := db.Find(&user).Error; err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "data not found",
+				"data":    nil,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "succes get all user data",
+			"data":    &user,
+		})
+		config.CloseDB(*db)
+	}
+}
+
+func (u UserConnection) UpdateUser() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user entity.User
+		db := config.ConnectDB()
+		config.CloseDB(*db)
+		param := c.Param("id")
+
+		if err := db.Where("id = ?", param).First(&user).Error; err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "User with that id not found",
+			})
+			return
+		}
+
+		if err := c.ShouldBindJSON(&user); err != nil {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{
+				"message": "Failed Update User",
+			})
+			return
+		}
+
+		result := db.Save(&user)
+		if result.RowsAffected <= 0 {
+			panic("Error inserting to db")
+		}
+		c.JSON(http.StatusCreated, gin.H{
+			"message": "Succes Updating User",
+			"data":    user,
+		})
+	}
+
+}
+
+func (u UserConnection) DeleteUser() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user entity.User
+		db := config.ConnectDB()
+		config.CloseDB(*db)
+
+		param := c.Param("id")
+
+		if err := db.Where("id = ?", param).First(&user).Error; err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "User not found",
+			})
+			return
+		}
+
+		result := db.Delete(&user)
+		if result.RowsAffected <= 0 {
+			panic("Error")
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Succesfull Delete User",
+		})
+
+	}
 }

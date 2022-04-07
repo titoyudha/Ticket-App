@@ -119,11 +119,7 @@ func (r *OrderRepository) UpdateOrder() gin.HandlerFunc {
 		var order entity.Order
 		var db = config.ConnectDB()
 
-		sql, err := db.DB()
-		if err != nil {
-			panic(err)
-		}
-		defer sql.Close()
+		config.CloseDB(*db)
 
 		if err := db.Where("id = ?", c.Param("id")).First(&order).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{

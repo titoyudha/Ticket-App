@@ -36,3 +36,12 @@ func ConnectDB() *gorm.DB {
 
 	return db
 }
+
+func CloseDB(db gorm.DB) {
+
+	sql, err := db.DB()
+	if err != nil {
+		panic(err)
+	}
+	defer sql.Close()
+}
